@@ -49,6 +49,7 @@ namespace FinalProject_ERMS.Controllers
         public IActionResult Create()
         {
             ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email");
+            ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name");
             return View();
         }
 
@@ -81,6 +82,7 @@ namespace FinalProject_ERMS.Controllers
                 return NotFound();
             }
             ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email", project.ManagerId);
+            ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name", project.ManagerId);
             return View(project);
         }
 

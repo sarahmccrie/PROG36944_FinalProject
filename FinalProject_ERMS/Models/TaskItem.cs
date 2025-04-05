@@ -1,8 +1,8 @@
-﻿namespace FinalProject_ERMS.Models
-{
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+namespace FinalProject_ERMS.Models
+{   
     public class TaskItem
     {
         [Key]

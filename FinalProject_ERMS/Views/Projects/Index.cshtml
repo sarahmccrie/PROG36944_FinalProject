@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<FinalProject_ERMS.Models.Project>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Index Projects List";
 }
 
-<h1>Index</h1>
+<h2>Projects List</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -45,9 +45,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.EndDate)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Manager.Email)
-            </td>
+                <td>
+                    @item.Manager?.Name
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ProjectId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ProjectId">Details</a> |
