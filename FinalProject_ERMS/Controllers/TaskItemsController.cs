@@ -49,28 +49,90 @@ namespace FinalProject_ERMS.Controllers
         // GET: TaskItems/Create
         public IActionResult Create()
         {
-            ViewData["AssignedEmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "Name");
             ViewBag.ProjectList = new SelectList(_context.Projects, "ProjectId", "Name");
             ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name");
+
+            ViewBag.PriorityList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "High", Text = "High" },
+                new SelectListItem { Value = "Medium", Text = "Medium" },
+                new SelectListItem { Value = "Low", Text = "Low" }
+            };
+
+            ViewBag.StatusList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Not Started", Text = "Not Started" },
+                new SelectListItem { Value = "In Progress", Text = "In Progress" },
+                new SelectListItem { Value = "Completed", Text = "Completed" },
+                new SelectListItem { Value = "Blocked", Text = "Blocked" }
+            };
+
             return View();
         }
+
 
         // POST: TaskItems/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TaskId,Name,Description,ProjectId,AssignedEmployeeId,Priority,Status")] TaskItem taskItem)
         {
+            Console.WriteLine("POST Create action called for TaskItem");
+            Console.WriteLine($"TaskId: {taskItem.TaskId}");
+            Console.WriteLine($"Name: {taskItem.Name}");
+            Console.WriteLine($"Description: {taskItem.Description}");
+            Console.WriteLine($"ProjectId: {taskItem.ProjectId}");
+            Console.WriteLine($"AssignedEmployeeId: {taskItem.AssignedEmployeeId}");
+            Console.WriteLine($"Priority: {taskItem.Priority}");
+            Console.WriteLine($"Status: {taskItem.Status}");
+
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("ModelState is NOT valid");
+                foreach (var state in ModelState)
+                {
+                    var key = state.Key;
+                    var errors = state.Value.Errors;
+                    foreach (var error in errors)
+                    {
+                        Console.WriteLine($"ModelState error for {key}: {error.ErrorMessage}");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("ModelState is valid. Proceeding to save.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(taskItem);
                 await _context.SaveChangesAsync();
+                Console.WriteLine("TaskItem saved successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AssignedEmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email", taskItem.AssignedEmployeeId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "Name", taskItem.ProjectId);
+
+            ViewBag.ProjectList = new SelectList(_context.Projects, "ProjectId", "Name");
+            ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name");
+
+            ViewBag.PriorityList = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "High", Text = "High" },
+        new SelectListItem { Value = "Medium", Text = "Medium" },
+        new SelectListItem { Value = "Low", Text = "Low" }
+    };
+
+            ViewBag.StatusList = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Not Started", Text = "Not Started" },
+        new SelectListItem { Value = "In Progress", Text = "In Progress" },
+        new SelectListItem { Value = "Completed", Text = "Completed" },
+        new SelectListItem { Value = "Blocked", Text = "Blocked" }
+    };
+
             return View(taskItem);
         }
+
+
 
         // GET: TaskItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -85,11 +147,26 @@ namespace FinalProject_ERMS.Controllers
             {
                 return NotFound();
             }
-            ViewData["AssignedEmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email", taskItem.AssignedEmployeeId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "Name", taskItem.ProjectId);
             ViewBag.ProjectList = new SelectList(_context.Projects, "ProjectId", "Name");
             ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name");
+
+            ViewBag.PriorityList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "High", Text = "High" },
+                new SelectListItem { Value = "Medium", Text = "Medium" },
+                new SelectListItem { Value = "Low", Text = "Low" }
+            };
+
+            ViewBag.StatusList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Not Started", Text = "Not Started" },
+                new SelectListItem { Value = "In Progress", Text = "In Progress" },
+                new SelectListItem { Value = "Completed", Text = "Completed" },
+                new SelectListItem { Value = "Blocked", Text = "Blocked" }
+            };
+
             return View(taskItem);
+
         }
 
         // POST: TaskItems/Edit/5
@@ -122,9 +199,26 @@ namespace FinalProject_ERMS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AssignedEmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email", taskItem.AssignedEmployeeId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "Name", taskItem.ProjectId);
+            ViewBag.ProjectList = new SelectList(_context.Projects, "ProjectId", "Name");
+            ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name");
+
+            ViewBag.PriorityList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "High", Text = "High" },
+                new SelectListItem { Value = "Medium", Text = "Medium" },
+                new SelectListItem { Value = "Low", Text = "Low" }
+            };
+
+            ViewBag.StatusList = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Not Started", Text = "Not Started" },
+                new SelectListItem { Value = "In Progress", Text = "In Progress" },
+                new SelectListItem { Value = "Completed", Text = "Completed" },
+                new SelectListItem { Value = "Blocked", Text = "Blocked" }
+            };
+
             return View(taskItem);
+
         }
 
         // GET: TaskItems/Delete/5

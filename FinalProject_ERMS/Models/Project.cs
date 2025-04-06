@@ -21,9 +21,7 @@ namespace FinalProject_ERMS.Models
         [ForeignKey("Manager")]
         public int ManagerId { get; set; }
 
-        public Employee Manager { get; set; }
-
-        // Navigation property
-        public ICollection<TaskItem> Tasks { get; set; }
+        public Employee? Manager { get; set; }
+        public ICollection<TaskItem>? Tasks { get; set; }
     }
 }

@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FinalProject_ERMS.Models
 {
-
     public class Employee
     {
         [Key]
@@ -17,7 +16,9 @@ namespace FinalProject_ERMS.Models
 
         [Required]
         public string Role { get; set; }
-        public ICollection<Project> ManagedProjects { get; set; }
-        public ICollection<TaskItem> AssignedTasks { get; set; }
+
+        public ICollection<Project> ManagedProjects { get; set; } = new List<Project>();
+        public ICollection<TaskItem> AssignedTasks { get; set; } = new List<TaskItem>();
     }
+
 }

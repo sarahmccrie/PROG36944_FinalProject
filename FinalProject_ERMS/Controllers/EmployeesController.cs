@@ -46,6 +46,7 @@ namespace FinalProject_ERMS.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
+            ViewBag.Roles = new List<string> { "Admin", "Manager", "Employee" };
             return View();
         }
 
@@ -54,13 +55,37 @@ namespace FinalProject_ERMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EmployeeId,Name,Email,Role")] Employee employee)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
             }
-            return View(employee);
+
+            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+            Console.WriteLine($"Employee Name: {employee.Name}");
+            Console.WriteLine($"Employee Email: {employee.Email}");
+            Console.WriteLine($"Employee Role: {employee.Role}");
+
+            if (!ModelState.IsValid)
+            {
+                foreach (var value in ModelState.Values)
+                {
+                    foreach (var error in value.Errors)
+                    {
+                        Console.WriteLine($"Validation error: {error.ErrorMessage}");
+                    }
+                }
+
+                ViewBag.Roles = new List<string> { "Admin", "Manager", "Employee" };
+                return View(employee);
+            }
+
+            _context.Add(employee);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Employees/Edit/5
@@ -76,6 +101,7 @@ namespace FinalProject_ERMS.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Roles = new List<string> { "Admin", "Manager", "Employee" };
             return View(employee);
         }
 
@@ -109,6 +135,9 @@ namespace FinalProject_ERMS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Roles = new List<string> { "Admin", "Manager", "Employee" };
+
             return View(employee);
         }
 

@@ -49,7 +49,12 @@ namespace FinalProject_ERMS.Controllers
         public IActionResult Create()
         {
             ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email");
-            ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name");
+            ViewBag.ManagerList = new SelectList(
+                _context.Employees.Where(e => e.Role == "Manager"),
+                "EmployeeId",
+                "Name"
+            );
+
             return View();
         }
 
@@ -58,15 +63,32 @@ namespace FinalProject_ERMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProjectId,Name,Description,StartDate,EndDate,ManagerId")] Project project)
         {
+            if (!ModelState.IsValid)
+            {
+                foreach (var state in ModelState)
+                {
+                    var key = state.Key;
+                    var errors = state.Value.Errors;
+                    foreach (var error in errors)
+                    {
+                        Console.WriteLine($"Validation error for {key}: {error.ErrorMessage}");
+                    }
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(project);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email", project.ManagerId);
+
+            ViewBag.ManagerList = new SelectList(_context.Employees
+                .Where(e => e.Role == "Manager")
+                .ToList(), "EmployeeId", "Name");
             return View(project);
         }
+
 
         // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -82,7 +104,13 @@ namespace FinalProject_ERMS.Controllers
                 return NotFound();
             }
             ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email", project.ManagerId);
-            ViewBag.EmployeeList = new SelectList(_context.Employees, "EmployeeId", "Name", project.ManagerId);
+            ViewBag.ManagerList = new SelectList(
+                _context.Employees.Where(e => e.Role == "Manager"),
+                "EmployeeId",
+                "Name",
+                project.ManagerId
+            );
+
             return View(project);
         }
 
@@ -100,7 +128,18 @@ namespace FinalProject_ERMS.Controllers
             {
                 try
                 {
-                    _context.Update(project);
+                    var existingProject = await _context.Projects.FindAsync(id);
+                    if (existingProject == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingProject.Name = project.Name;
+                    existingProject.Description = project.Description;
+                    existingProject.StartDate = project.StartDate;
+                    existingProject.EndDate = project.EndDate;
+                    existingProject.ManagerId = project.ManagerId;
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
