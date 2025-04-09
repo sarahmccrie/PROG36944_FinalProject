@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FinalProject_ERMS.Data;
 using FinalProject_ERMS.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinalProject_ERMS.Controllers
 {
+    [Authorize(Roles = "Admin,Manager,Employee")]
     public class TaskItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
