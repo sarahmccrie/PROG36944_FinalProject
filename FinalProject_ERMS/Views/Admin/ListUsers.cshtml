@@ -1,0 +1,35 @@
+﻿@model List<FinalProject_ERMS.ViewModels.UserWithRoleViewModel>
+
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<h2>Manage Users</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@string.Join(", ", user.Roles)</td>
+                <td>
+                    <a asp-action="EditUserRole" asp-route-userId="@user.UserId" class="btn btn-sm btn-primary">Edit Role</a>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-danger" asp-action="DeleteUser" asp-route-userId="@user.UserId">Delete</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="CreateUser" class="btn btn-success">Create New User</a>
