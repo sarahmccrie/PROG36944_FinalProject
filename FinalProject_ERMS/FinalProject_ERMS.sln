@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinalProject_ERMS", "FinalProject_ERMS.csproj", "{7C999AD2-089F-45FF-915F-28DE9D197435}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinalProject_ERMS", "FinalProject_ERMS.csproj", "{7C999AD2-089F-45FF-915F-28DE9D197435}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinalProject_ERMS.Tests", "..\FinalProject_ERMS.Tests\FinalProject_ERMS.Tests.csproj", "{AAD48CB1-9C3E-4945-AB59-1020B6847C1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7C999AD2-089F-45FF-915F-28DE9D197435}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C999AD2-089F-45FF-915F-28DE9D197435}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C999AD2-089F-45FF-915F-28DE9D197435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAD48CB1-9C3E-4945-AB59-1020B6847C1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAD48CB1-9C3E-4945-AB59-1020B6847C1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAD48CB1-9C3E-4945-AB59-1020B6847C1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAD48CB1-9C3E-4945-AB59-1020B6847C1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
