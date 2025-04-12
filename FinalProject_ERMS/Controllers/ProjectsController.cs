@@ -1,181 +1,185 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using FinalProject_ERMS.Data;
-using FinalProject_ERMS.Models;
 using Microsoft.AspNetCore.Authorization;
+using FinalProject_ERMS.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FinalProject_ERMS.Controllers
 {
     [Authorize(Roles = "Admin,Manager")]
     public class ProjectsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProjectsController(ApplicationDbContext context)
+        public ProjectsController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private void CopyCookiesToRequest(HttpRequestMessage requestMessage)
+        {
+            var cookie = _httpContextAccessor.HttpContext.Request.Headers["Cookie"];
+            if (!string.IsNullOrEmpty(cookie))
+            {
+                requestMessage.Headers.Add("Cookie", cookie.ToString());
+            }
+        }
+
+        private async Task LoadManagersAsync(object selectedManager = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "/api/EmployeesApi");
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var employees = await response.Content.ReadFromJsonAsync<List<Employee>>();
+                var managers = employees.Where(e => e.Role == "Manager").ToList();
+                ViewBag.ManagerList = new SelectList(managers, "EmployeeId", "Name", selectedManager);
+            }
+            else
+            {
+                ViewBag.ManagerList = new SelectList(new List<Employee>(), "EmployeeId", "Name");
+            }
         }
 
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Projects.Include(p => p.Manager);
-            return View(await applicationDbContext.ToListAsync());
+            var request = new HttpRequestMessage(HttpMethod.Get, "/api/ProjectsApi");
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+                return Problem("API call failed.");
+
+            var projects = await response.Content.ReadFromJsonAsync<List<Project>>();
+            return View(projects);
         }
 
         // GET: Projects/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var project = await _context.Projects
-                .Include(p => p.Manager)
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/ProjectsApi/{id}");
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+                return Problem("API call failed.");
+
+            var project = await response.Content.ReadFromJsonAsync<Project>();
+            if (project == null) return NotFound();
 
             return View(project);
         }
 
         // GET: Projects/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email");
-            ViewBag.ManagerList = new SelectList(
-                _context.Employees.Where(e => e.Role == "Manager"),
-                "EmployeeId",
-                "Name"
-            );
-
+            await LoadManagersAsync();
             return View();
         }
 
         // POST: Projects/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectId,Name,Description,StartDate,EndDate,ManagerId")] Project project)
+        public async Task<IActionResult> Create(Project project)
         {
             if (!ModelState.IsValid)
             {
-                foreach (var state in ModelState)
-                {
-                    var key = state.Key;
-                    var errors = state.Value.Errors;
-                    foreach (var error in errors)
-                    {
-                        Console.WriteLine($"Validation error for {key}: {error.ErrorMessage}");
-                    }
-                }
+                await LoadManagersAsync(project.ManagerId);
+                return View(project);
             }
 
-            if (ModelState.IsValid)
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/ProjectsApi")
             {
-                _context.Add(project);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Content = JsonContent.Create(project)
+            };
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to create project via API.");
+                await LoadManagersAsync(project.ManagerId);
+                return View(project);
             }
 
-            ViewBag.ManagerList = new SelectList(_context.Employees
-                .Where(e => e.Role == "Manager")
-                .ToList(), "EmployeeId", "Name");
-            return View(project);
+            return RedirectToAction(nameof(Index));
         }
-
 
         // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-            ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email", project.ManagerId);
-            ViewBag.ManagerList = new SelectList(
-                _context.Employees.Where(e => e.Role == "Manager"),
-                "EmployeeId",
-                "Name",
-                project.ManagerId
-            );
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/ProjectsApi/{id}");
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
 
+            if (!response.IsSuccessStatusCode)
+                return Problem("API call failed.");
+
+            var project = await response.Content.ReadFromJsonAsync<Project>();
+            if (project == null) return NotFound();
+
+            await LoadManagersAsync(project.ManagerId);
             return View(project);
         }
 
         // POST: Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProjectId,Name,Description,StartDate,EndDate,ManagerId")] Project project)
+        public async Task<IActionResult> Edit(int id, Project project)
         {
             if (id != project.ProjectId)
-            {
                 return NotFound();
-            }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var existingProject = await _context.Projects.FindAsync(id);
-                    if (existingProject == null)
-                    {
-                        return NotFound();
-                    }
-
-                    existingProject.Name = project.Name;
-                    existingProject.Description = project.Description;
-                    existingProject.StartDate = project.StartDate;
-                    existingProject.EndDate = project.EndDate;
-                    existingProject.ManagerId = project.ManagerId;
-
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProjectExists(project.ProjectId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await LoadManagersAsync(project.ManagerId);
+                return View(project);
             }
-            ViewData["ManagerId"] = new SelectList(_context.Employees, "EmployeeId", "Email", project.ManagerId);
-            return View(project);
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/ProjectsApi/{project.ProjectId}")
+            {
+                Content = JsonContent.Create(project)
+            };
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to update project via API.");
+                await LoadManagersAsync(project.ManagerId);
+                return View(project);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Projects/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var project = await _context.Projects
-                .Include(p => p.Manager)
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/api/ProjectsApi/{id}");
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+                return Problem("API call failed.");
+
+            var project = await response.Content.ReadFromJsonAsync<Project>();
+            if (project == null) return NotFound();
 
             return View(project);
         }
@@ -185,19 +189,16 @@ namespace FinalProject_ERMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project != null)
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"/api/ProjectsApi/{id}");
+            CopyCookiesToRequest(request);
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
             {
-                _context.Projects.Remove(project);
+                ModelState.AddModelError(string.Empty, "Failed to delete project via API.");
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProjectExists(int id)
-        {
-            return _context.Projects.Any(e => e.ProjectId == id);
         }
     }
 }
