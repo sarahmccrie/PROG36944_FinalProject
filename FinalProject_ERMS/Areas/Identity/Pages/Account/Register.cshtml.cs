@@ -68,6 +68,10 @@ namespace FinalProject_ERMS.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Select Role")]
+            public string Role { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -93,8 +97,16 @@ namespace FinalProject_ERMS.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Assign default role "Employee"
-                    await _userManager.AddToRoleAsync(user, "Employee");
+                    // Assign selected role
+                    if (!string.IsNullOrEmpty(Input.Role))
+                    {
+                        var roleExists = await _roleManager.RoleExistsAsync(Input.Role);
+                        if (roleExists)
+                        {
+                            await _userManager.AddToRoleAsync(user, Input.Role);
+                        }
+                    }
+
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
