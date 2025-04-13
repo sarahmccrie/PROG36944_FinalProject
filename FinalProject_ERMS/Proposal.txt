@@ -1,0 +1,72 @@
+Project: FinalProject_ERMS - Enterprise Resource Management System
+Name: Sarah McCrie (991405606)
+Course: PROG36944 Advanced .NET Server Side Technologies
+Description: 
+"The Enterprise Resource Management System (ERMS) is a web-based platform for managing employees, projects, and tasks. It includes user authentication, reporting, REST API integration, and security. This capstone project will test your ability to build a full-stack application using ASP.NET Core MVC, Web API, SQL Server, Security, and Deployment."
+
+** Live version deployed with Azure **
+URL: https://finalproject-erms-mccries.azurewebsites.net/
+
+**GitHub Repo**
+URL: https://github.com/sarahmccrie/PROG36944_FinalProject
+
+** Environment Setup **
+    - Visual Studio
+    - .Net 8
+    - Git (GitHub)
+    - Asure (App service & SQL database)
+
+** Technologies Used **
+    - ASP.NET Core MVC
+    - ASP.NET Core Web API
+    - SQL Server
+    - GitHub
+    - Azure App Service, Azure SQL Database
+    - SSRS (SQL Server Reporting Services)
+    - Application Insights (Logging & Monitoring)
+
+-----------------------------------------------------------------------
+
+** Reflection **
+    My capstone project is a complete web application built to help manage employees, projects, and tasks all in one place. It’s developed using ASP.NET Core MVC and Web API, with SQL Server handling the backend, all deployed on Azure for hosting and database management.
+    The application allows users to create accounts, select their role (Admin, Manager, or Employee), and interact with data through both web pages and secure API endpoints. Role-based access control ensures that Admins and Managers have appropriate permissions for managing employee records, assigning tasks, and tracking project progress.
+    The database is fully normalized and connected with correct relationships, and I’ve created dynamic reports using SQL Server Reporting Services (SSRS) to display task performance and project status. For monitoring and logging, I integrated Azure Application Insights directly into my Azure App Service. This setup captures live telemetry including request logs, exceptions, failures, and performance metrics. Application Insights allows me to monitor my application health in real-time and view historical data via the Azure Portal. Screenshot of the Application Insights setup are included in zipped folder for reference.
+    Throughout development, I maintained version control with GitHub, pushing updates regularly to manage progress and ensure smooth deployment. The final application runs fully in the cloud and is easy to scale, manage, and monitor.
+
+
+
+** Requirements/Deliverables and how they were achieved **
+
+1. Project Planning & Documentation (10)
+    - Proposal: In Solution folder.
+    - ERD: In solution folder
+    - Environment: Visual Studio 2022 used, .NET Core 8, Azure SQL Database created, deployed to Azure App Service.
+    - Version Control: GitHub repository: https://github.com/sarahmccrie/PROG36944_FinalProject
+
+2. MVC Implementation (20):
+    - User Authentication: ASP.NET Identity. Custom Registration with role selection (Admin/Manager/Employee). Role enforcement in controllers using [Authorize] attributes.
+    - Employee Management: Full CRUD implemented in EmployeesController.cs. Azure-hosted, available on /Employees page.
+    - Project Management: Full CRUD in ProjectsController.cs. Manager assignment via drop-down list.
+    - Task Management: Full CRUD in TaskItemsController.cs. Includes priority and status fields.
+
+3. Web API Development & Integration (20)
+    - REST API: API controllers (EmployeesApiController, ProjectsApiController, TaskItemsApiController) provide CRUD endpoints.
+    - CRUD Operations: Supports GET, POST, PUT, DELETE with appropriate routes.
+    - API Security: Endpoints secured with ASP.NET Identity authentication. Only authenticated users can perform API actions.
+    - Client-Side Consumption: Used HttpClient inside MVC controllers to consume API data. Example: EmployeesController.cs calls API to list employees.
+
+4. Testing & Debugging (15)
+    - Unit Testing: Created xUnit tests for MVC controllers. Example test file: EmployeesControllerTests.cs.
+    - Mocking & Dependency Injection: Implemented mocking for repositories during testing.
+    - Test Coverage: Achieved over 5% — current project includes 57 passing tests, far exceeding minimum requirements.
+
+5. SQL Server & Reporting (15)
+    - Database Design: Normalized tables implemented in Azure SQL Database. Relationships and constraints created successfully.
+    - Stored Procedures: Example: GetTasksByStatus procedure implemented.
+    - Reporting (SSRS): Created custom reports for employee performance &project progress. rdl files and pdf copies included in submission
+
+6. Security & Deployment (20)
+    - Role-Based Access Control (RBAC): Implemented. Controller actions restricted by roles using [Authorize(Roles = "Admin")], etc.
+    - Data Security: EF Core preventing SQL Injection. ASP.NET’s anti-forgery tokens protect against CSRF. Input validation in models.
+    - Deployment: Successfully deployed to Azure App Service (URL: https://finalproject-erms-mccries.azurewebsites.net/). Database connection string points to Azure SQL Database.
+    - Logging & Monitoring: Integrated Azure Application Insights for live monitoring and error tracking.Screenshot in zipped folder.
