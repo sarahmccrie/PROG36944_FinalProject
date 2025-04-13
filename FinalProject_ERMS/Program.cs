@@ -26,7 +26,7 @@ namespace FinalProject_ERMS
 
             builder.Services.AddHttpClient("ApiClient", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:7174/"); 
+                client.BaseAddress = new Uri("https://finalproject-erms-mccries.azurewebsites.net/"); 
             }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 UseCookies = false 
