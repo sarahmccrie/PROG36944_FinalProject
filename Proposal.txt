@@ -1,0 +1,16 @@
+Project: FinalProject_ERMS - Enterprise Resource Management System
+Name: Sarah McCrie (991405606)
+Course: PROG36944 Advanced .NET Server Side Technologies
+Description:
+
+Environment Setup:
+- Visual Studio
+- .Net 8
+- Git
+
+Technologies Used:
+- ASP.NET Core MVC
+- ASP.NET Core Web API
+- SQL Server
+- GitHub
+- Azure/AWS
